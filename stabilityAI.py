@@ -46,6 +46,46 @@ def gen_img(textt):
     	with open(img_pth, "wb") as f:
     		f.write(base64.b64decode(image["base64"]))
     		
+
+    
+    # Set up the necessary variables for GitHub
+    repo_owner = "DevTimlas"
+    repo_name = "stabilityAPI"  # The name of the repository
+    file_path = "images/v1_txt2img.png"  # The path where you want to save the image in the repository
+    access_token = "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"  # Your GitHub access token
+
+    # Read the image file
+    with open(img_pth, "rb") as file:
+        image_data = file.read()
+
+    # Encode the image data as base64
+    encoded_image = base64.b64encode(image_data).decode("utf-8")
+
+    # Set up the API URL
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{file_path}"
+
+    # Set up the request headers
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # Set up the request payload
+    payload = {
+        "message": "Add image",
+        "content": encoded_image
+    }
+
+    # Make the API request
+    response = requests.put(url, json=payload, headers=headers)
+
+    # Check the response status
+    if response.status_code == 201:
+        print("Image saved successfully!")
+    else:
+        print(f"Failed to save the image. Status code: {response.status_code}")
+        print(response.json())
+
     return ('image saved...')
 
   
@@ -57,4 +97,3 @@ def index():
     user_input = request.json['user_input']
     res = str(gen_img(user_input))
     return jsonify({'msg': res})
-
